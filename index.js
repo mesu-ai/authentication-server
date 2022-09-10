@@ -27,9 +27,9 @@ async function run() {
 			const email = req.query.email;
 			const password = req.query.password;
 			console.log(email,password);
-      console.log(req.body);
+     
 			if (email) {
-				const query = { email: email };
+				const query = { email: email, password: password };
 				const result = await usersCollection.findOne(query);
 				console.log(result);
 				res.send(result);
@@ -45,8 +45,17 @@ async function run() {
 		app.post('/user', async (req, res) => {
       const cursor = req.body;
       console.log(cursor);
-			const result = await usersCollection.insertOne(cursor);
-			res.json(result);
+      const query = { email: req.body.email };
+				const oldUser = await usersCollection.findOne(query);
+        if(oldUser){
+          console.log('olduser');
+          res.send(oldUser);
+        }else{
+          const newUser = await usersCollection.insertOne(cursor);
+          console.log('newuser');
+          res.json(newUser);
+        }
+			
 		});
 
 		console.log('connect to db');
